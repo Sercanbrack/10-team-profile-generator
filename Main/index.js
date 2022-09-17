@@ -189,5 +189,3 @@ async function init() {
 }
 
 init()
-
-export default {init, createEngineer, createIntern, initialHTML, engineerHTML, internHTML, finishHTML, promptUser, menu}
