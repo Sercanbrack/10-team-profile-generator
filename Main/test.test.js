@@ -1,0 +1,2 @@
+const Program = require('./index')
+

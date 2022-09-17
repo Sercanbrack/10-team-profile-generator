@@ -28,6 +28,7 @@ const fs = require('fs')
 }
 
 async function menu() {
+    
     await inquirer.prompt([
         {
             type: 'list',
@@ -36,18 +37,25 @@ async function menu() {
             choices: ['Add engineer', 'Add intern', 'Assemble team']
         }
     ])
-        .then((answers) => {
-            switch (answers) {
+        .then(async (answers) => {
+            console.log('answers')
+            let newAnswers = answers.menu
+            switch (newAnswers) {
                 case 'Add engineer': {
-                    createEngineer()
-                    menu()
+                    await createEngineer()
+                    break
                 }
                 case 'Add intern': {
-                    createIntern()
-                    menu()
+                    await createIntern()
+                    break
                 }
                 case 'Assemble team': {
-                    return
+                    fs.appendFile('index.html', finishHTML(), (err) => {
+                        if(err) {
+                            console.log(err)
+                        }
+                    })
+                    break
                 }
             }
         })
@@ -110,7 +118,7 @@ async function createEngineer() {
         {
             type: 'input',
             name: "engineerName",
-            message: 'What is the engineer?',
+            message: "What is the engineer?",
         },
         {
             type: 'input',
@@ -128,7 +136,16 @@ async function createEngineer() {
             message: "What is the engineer's GitHub username?"
         }
     ])
-        .then((answers) => fs.appendFileSync('index.html', engineerHTML(answers)))
+        .then((answers) => {
+            console.log(answers)
+            fs.appendFile('index.html', engineerHTML(answers), (err) => {
+                if (err) {
+                    console.log(err)
+                }
+            }) 
+            return;
+        })
+        menu()
 }
     
 async function createIntern() {
@@ -154,15 +171,23 @@ async function createIntern() {
             message: "What is the intern's GitHub username?"
         }
     ])
-        .then((answers) => fs.appendFileSync('index.html', internHTML(answers)))
-}
+        .then((answers) => {
+            fs.appendFile('index.html', internHTML(answers), (err) => {
+                if (err) {
+                    console.log(err)
+                }
+            })
+        })
+        menu()
+    }
 
 async function init() {
     await promptUser()
         .then(() => console.log('Started building HTML file...'))
         .catch((err) => console.error(err))
-    await menu().then((fs.appendFileSync('index.html', finishHTML())))
+    await menu()
 }
 
 init()
 
+export default {init, createEngineer, createIntern, initialHTML, engineerHTML, internHTML, finishHTML, promptUser, menu}
