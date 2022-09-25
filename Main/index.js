@@ -1,3 +1,9 @@
+const Department = require('./department')
+const Employee = require('./Employee')
+const Role = require('./Manager')
+
+
+
 const inquirer = require('inquirer')
 const fs = require('fs')
 
