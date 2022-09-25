@@ -10,3 +10,5 @@ class Manager extends Employee {
         console.log('Current role: Manager')
     }
 }
+
+module.exports = Manager

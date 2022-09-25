@@ -1,6 +1,5 @@
-const Department = require('./department')
-const Employee = require('./Employee')
-const Role = require('./Manager')
+const Employee = require('../src/Employee')
+const Role = require('../src/Manager')
 
 
 
