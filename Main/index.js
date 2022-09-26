@@ -1,8 +1,7 @@
-const Employee = require('../src/Employee')
-const Role = require('../src/Manager')
-
-
-
+const Employee = require('./lib/Employee')
+const Manager = require('./lib/Manager')
+const Engineer = require('./lib/Engineer')
+const Intern = require('./lib/Intern')
 const inquirer = require('inquirer')
 const fs = require('fs')
 
@@ -10,25 +9,30 @@ const fs = require('fs')
     await inquirer.prompt([
         {
             type: 'input',
-            name: "managerName",
-            message: 'What is the name of the team manager?',
+            name: "name",
+            message: "'What is the team manager's name?",
         },
         {
             type: 'input',
-            name: "managerId",
+            name: "id",
             message: "What is the team manager's ID?",
         },
         {
             type: 'input',
-            name: "managerEmail",
+            name: "email",
             message: "What is the team manager's email?",
         },
         {
             type: 'number',
-            name: "managerOffice",
+            name: "office",
             message: "What is the team manager's office number?"
         }
-    ]).then((answers) => fs.writeFileSync('index.html', initialHTML(answers)))
+    ]).then((answers) => {
+        const manager = new Manager(answers.name, answers.id, answers.email, answers.office)
+        fs.writeFileSync('./dist/index.html', initialHTML(manager), (err) => {
+            console.log(err)
+        })
+    })
 
 }
 
@@ -55,11 +59,12 @@ async function menu() {
                     break
                 }
                 case 'Assemble team': {
-                    fs.appendFile('index.html', finishHTML(), (err) => {
+                    fs.appendFile('./dist/index.html', finishHTML(), (err) => {
                         if(err) {
                             console.log(err)
                         }
                     })
+                    console.log('Team successfully assembled! Please check the dist folder for your newly generated team profile.')
                     break
                 }
             }
@@ -67,53 +72,56 @@ async function menu() {
 
 }
 
-const initialHTML = ({managerName, managerId, managerEmail, managerOffice}) =>
+const initialHTML = (manager) =>
     `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="./Main/normalize.css">
-        <link rel="stylesheet" href="./Main/skeleton.css">
+        <link rel="stylesheet" href="./normalize.css">
+        <link rel="stylesheet" href="./skeleton.css">
         <title>Team Assembly</title>
     </head>
     <body>
         <div>
             <div class="three columns" id="box">
-                <h1>${managerName}</h1>
+                <h1>${manager.name}</h1>
                 <h2>Manager</h2>
                 <ul>
-                    <li>ID: ${managerId}</li>
-                    <li>Email: ${managerEmail}</li>
-                    <li>Office Number: ${managerOffice}</li>
+                    <li>ID: ${manager.id}</li>
+                    <li>Email: ${manager.email}</li>
+                    <li>Office Number: ${manager.office}</li>
                 </ul>
              </div>`
 
-const engineerHTML = ({engineerName, engineerId, engineerEmail, engineerGithub}) => 
-    `<div class="three columns" id="box">
-        <h1>${engineerName}</h1>
+const engineerHTML = (engineer) => 
+    `
+    <div class="three columns" id="box">
+        <h1>${engineer.name}</h1>
         <h2>Engineer</h2>
         <ul>
-            <li>${engineerId}</li>
-            <li>${engineerEmail}</li>
-            <li>${engineerGithub}</li>
+            <li>ID: ${engineer.id}</li>
+            <li>Email: ${engineer.email}</li>
+            <li>GitHub Username: ${engineer.github}</li>
         </ul>
     </div>`
 
-const internHTML = ({internName, internId, internEmail, internGithub}) => 
-    `<div class="three columns" id="box">
-        <h1>${internName}</h1>
+const internHTML = (intern) => 
+    `
+    <div class="three columns" id="box">
+        <h1>${intern.name}</h1>
         <h2>Intern</h2>
         <ul>
-            <li>ID: ${internId}</li>
-            <li>Email: ${internEmail}</li>
-            <li>GitHub: ${internGithub}</li>
+            <li>ID: ${intern.id}</li>
+            <li>Email: ${intern.email}</li>
+            <li>Studying at: ${intern.school}</li>
         </ul>
     </div>`
 
 const finishHTML = () => 
-    `</div>
+    `
+    </div>
     </body>
     </html>`
 
@@ -122,28 +130,28 @@ async function createEngineer() {
     await inquirer.prompt([
         {
             type: 'input',
-            name: "engineerName",
-            message: "What is the engineer?",
+            name: "name",
+            message: "What is the engineer's name?",
         },
         {
             type: 'input',
-            name: "engineerId",
+            name: "id",
             message: "What is the engineer's ID?",
         },
         {
             type: 'input',
-            name: "engineerEmail",
+            name: "email",
             message: "What is the engineer's email?",
         },
         {
             type: 'input',
-            name: "engineerGithub",
+            name: "github",
             message: "What is the engineer's GitHub username?"
         }
     ])
         .then((answers) => {
-            console.log(answers)
-            fs.appendFile('index.html', engineerHTML(answers), (err) => {
+            const engineer = new Engineer(answers.name, answers.id, answers.email, answers.github)
+            fs.appendFile('./dist/index.html', engineerHTML(engineer), (err) => {
                 if (err) {
                     console.log(err)
                 }
@@ -157,27 +165,28 @@ async function createIntern() {
     await inquirer.prompt([
         {
             type: 'input',
-            name: "internName",
-            message: 'What is the intern?',
+            name: "name",
+            message: "'What is the intern's name?",
         },
         {
             type: 'input',
-            name: "internId",
+            name: "id",
             message: "What is the intern's ID?",
         },
         {
             type: 'input',
-            name: "internEmail",
+            name: "email",
             message: "What is the intern's email?",
         },
         {
             type: 'input',
-            name: "internGithub",
-            message: "What is the intern's GitHub username?"
+            name: "school",
+            message: "What school or university is the intern studying at?"
         }
     ])
         .then((answers) => {
-            fs.appendFile('index.html', internHTML(answers), (err) => {
+            const intern = new Intern(answers.name, answers.id, answers.email, answers.school)
+            fs.appendFile('./dist/index.html', internHTML(answers), (err) => {
                 if (err) {
                     console.log(err)
                 }
